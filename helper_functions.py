@@ -66,7 +66,7 @@ def plot_accuracy(model):
 
 
 
-def evaluate_on_training_set(y_test, y_pred):
+def evaluate(y_test, y_pred):
     result={}
       # Calculate AUC
     result['AUC']=roc_auc_score(y_test,y_pred)
