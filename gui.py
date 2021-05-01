@@ -9,13 +9,18 @@ from ui_backend import *
 
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
+def getTrainData():
+    train_data = pd.read_csv("./Data/SPY_train_2008_2020.csv")
+    train1=train("./Data/SPY_train_2008_2016.csv")
+    test_data = pd.read_csv("./Data/SPY_test_2016_2017.csv")
+    return train1, train_data, test_data
+
+@st.cache(allow_output_mutation=True)
 def uiBackend():
     backend = Backend()
     backend.get_model_predictions()
     # st.write("Cache miss: ui backend")
     return backend
-
-becopy = copy.deepcopy(uiBackend())
 
 def getGraphs(dataset,plot_type):
     # plot cci
@@ -27,7 +32,7 @@ def getGraphs(dataset,plot_type):
         ax.set_ylabel("CCI")
     if plot_type=="macd":
         ax.plot(dataset.macd)
-        ax.set_title("MACD Timeseries")
+        ax.set_title("Moving Average Convergence Divergence (MACD) Timeseries")
         ax.set_xlabel("Day")
         ax.set_ylabel("MACD")
     if plot_type=="signal":
@@ -63,25 +68,23 @@ def heatmap(data,sdate):
     # Loop over data dimensions and create text annotations.
     for i in range(len(cols)):
         for j in y:
-            text = ax.text(j-1, i, round(info[i][j-1],2),
-                    ha="center", va="center", color="w", size='xx-small')
+            text = ax.text(j-1, i, round(info[i][j-1],2), ha="center", va="center", color="w", size='xx-small')
 
     ax.set_title("stock data for "+sdate)
     fig.tight_layout()
     return fig
 
 def main():
+    becopy = uiBackend()
     st.title("50.039 Big Project Group 16")
     st.sidebar.title("Navigation")
+    train1, train_data, test_data = getTrainData()
     choice = st.sidebar.radio("",['Data Visualisation',"Test Set"])
     if choice != "Test Set":
         # display dataset
         st.subheader("Raw Training Dataset")
-        train_data = pd.read_csv("./Data/SPY_train_2008_2020.csv")
         train_data
-        
         # display graphs
-        train1=train("./Data/SPY_train_2008_2016.csv")
         col1,col2 = st.beta_columns(2)
         col1.write(getGraphs(train1,"cci"))
         col2.write(getGraphs(train1,"macd"))
@@ -89,14 +92,9 @@ def main():
         col2.write(getGraphs(train1,"hist"))
 
     else:
-        st.subheader("Test Dataset (Load model and try here)")
-        # load_model=torch.load("./models/train1model.pt")
-        # test1=test("./Data/SPY_test_2016_2017.csv")
-        test_data = pd.read_csv("./Data/SPY_test_2016_2017.csv")
-        test_data
-        # print(validation(load_model,test_loader,nn.CrossEntropyLoss()))
+        st.subheader("Which date would you like to choose?")
         # slider for display of each data
-        selected_date = st.slider("Which date would you like to choose?",value=dti(2016,12,1),format="DD/MM/YYYY",min_value=dti(2016,1,4),max_value=dti(2017,12,29))
+        selected_date = st.slider("",value=dti(2016,12,1),format="DD/MM/YYYY",min_value=dti(2016,3,4),max_value=dti(2017,11,20))
         sDate = str(selected_date).split(" ")[0]
         st.subheader("Selected date:" + sDate)
         newdf = test_data[test_data.Date==sDate]
@@ -114,7 +112,7 @@ def main():
             st.header("Ground Truth Label: "+str(a[2]))
             st.header("Predicted Value: "+str(a[1]))
             if a[1] == 1:
-                st.header("From the **model**,It is predicted to **RISE** the next day:sunglasses:")
+                st.header("From the **model**, It is predicted to **RISE** the next day:sunglasses:")
             else:
                 st.header("From the **model** , It is predicted to **FALL** the next day")
             fig=heatmap(data,sDate)
