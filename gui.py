@@ -106,7 +106,7 @@ def main():
             a = becopy.get_individual_data_sample(sDate)
             data={'High':a[0][0], 'Low':a[0][1], 'Close':a[0][2],\
                 'CCI-5':a[0][3], 'CCI-10':a[0][4], 'CCI-20':a[0][5], \
-                'MACD':a[0][6], 'MACD-Signal':a[0][7], 'MACD-History':a[0][8]}
+                'MACD':a[0][6], 'MACD-Signal':a[0][7], 'MACD-Histogram':a[0][8]}
             df = pd.DataFrame(data)
             st.subheader("Data Features")
             df.T
