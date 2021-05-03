@@ -8,6 +8,10 @@ from torch.utils.data import Dataset, DataLoader
 
 
 class train(Dataset):
+    '''
+    This is the class for training dataset
+    The class will load the training dataset, process the original data to get image data for training model 
+    '''
     def __init__(self,path):
         self.dataset_paths=path
         
@@ -26,6 +30,9 @@ class train(Dataset):
         self.train_date, self.train_images, self.train_labels=self.get_features()
         
     def get_CCI(self,data, ndays):
+        '''
+        The function calculates the CCI values of our dataset
+        '''
         typical_price = (data['High'] + data['Low'] + data['Close']) / 3 
         moving_avg = typical_price.rolling(ndays).mean()
         mean_deviation = typical_price.rolling(ndays).apply(lambda x: pd.Series(x).mad())
@@ -33,6 +40,9 @@ class train(Dataset):
         return CCI
     
     def get_macd_indicators(self,data):
+        '''
+        The function calculates the MACD values of our dataset
+        '''
         moving_avg26 = data['Close'].rolling(26).mean()
         exp_moving_avg12 = data['Close'].ewm(span=12, adjust=False).mean()
         macd = exp_moving_avg12 - moving_avg26
@@ -41,6 +51,9 @@ class train(Dataset):
         return macd, signal, macd_hist
     
     def get_train_images(self,train_features):
+        '''
+        The function produce the image data that we need for our training
+        '''
         train_images = []
         for i in range(len(train_features)-9):
             image1 = train_features[self.price_features][i:i+10].T
@@ -58,12 +71,18 @@ class train(Dataset):
         return train_images
     
     def plot_CCI(self):
+        '''
+        The function plot CCI values of the dataset
+        '''
         fig, ax = plt.subplots()
         ax.plot(self.get_CCI(self.train, self.ndays1)[:100])
         plt.show()
         return None
     
     def plot_macd(self):
+        '''
+        The function plot MACD values of the dataset
+        '''
         fig,ax=plt.subplots()
         ax.plot(self.macd)
         ax.set_title("MACD Timeseries")
@@ -73,6 +92,9 @@ class train(Dataset):
         return None
         
     def plot_signal(self):
+        '''
+        The function plot signal values of the dataset
+        '''
         fig,ax=plt.subplots()
         ax.plot(self.signal)
         ax.set_title("MACD signal Timeseries")
@@ -82,6 +104,9 @@ class train(Dataset):
         return None
         
     def plot_macd_hist(self):
+        '''
+        The function plot MACD histogram of the dataset
+        '''
         fig,ax=plt.subplots()
         ax.plot(self.macd_hist)
         ax.set_title("MACD histogram Timeseries")
@@ -141,6 +166,10 @@ class train(Dataset):
 
 
 class val(Dataset):
+    '''
+    This is the class for validation dataset
+    The class will load the validation dataset, process the original data to get image data for training model 
+    '''
     def __init__(self,path):
         self.dataset_paths=path
         
@@ -273,6 +302,10 @@ class val(Dataset):
 
 
 class test(Dataset):
+    '''
+    This is the class for testing dataset
+    The class will load the testing dataset, process the original data to get image data
+    '''
     def __init__(self,path):
         self.dataset_paths=path
         

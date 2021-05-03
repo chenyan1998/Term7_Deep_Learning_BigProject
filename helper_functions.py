@@ -6,6 +6,10 @@ import torch
 import torch.nn as nn
 
 def cal_acc(outputs,labels):
+  '''
+  The function takes in outputs of the model and the original label.
+  It calculates the average accuracy.Returns average accuracy.
+  '''
     pred_labels=torch.max(outputs,1)[1]
     equality = torch.eq(pred_labels,labels).float()
     accuracy = torch.mean(equality)
@@ -46,6 +50,9 @@ def validation(model, validation_loader, criterion):
     return val_loss,val_acc,output_list,labels_list
 
 def plot_loss(model):
+  '''
+  The function plot loss curve
+  '''
     plt.plot(model.history['train_loss'], label='Loss (training data)')
     plt.plot(model.history['validation_loss'], label='Loss (validation data)')
     plt.ylabel('Loss')
@@ -56,6 +63,9 @@ def plot_loss(model):
     return None
 
 def plot_accuracy(model):
+    '''
+  The function plot accuracy curve
+  '''
     plt.plot(model.history['train_accuracy'], label='Accuracy (training data)')
     plt.plot(model.history['validation_accuracy'], label='Accuracy (validation data)')
     plt.ylabel('Accuracy')
@@ -67,6 +77,12 @@ def plot_accuracy(model):
 
 
 def evaluate(y_test, y_pred):
+  '''
+  the function takes in the predicted y label and original y label
+  It calculates the AUC, precison, recall, f1-score, confucion matrix.
+  It also plot the ROC curve
+  return a dictionary that stores all the values and a ROC figure.  
+  '''
     result={}
       # Calculate AUC
     result['AUC']=roc_auc_score(y_test,y_pred)
