@@ -3,18 +3,19 @@ import pandas as pd
 from datetime import datetime as dti
 import numpy as np
 import copy
-
 import matplotlib.pyplot as plt
 from ui_backend import *
 
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
+# function to get all the datasets for display
 def getTrainData():
     train_data = pd.read_csv("./Data/SPY_train_2008_2020.csv")
     train1=train("./Data/SPY_train_2008_2016.csv")
     test_data = pd.read_csv("./Data/SPY_test_2016_2017.csv")
     return train1, train_data, test_data
 
+# function to get plots and individual data samples from the backend python file
 @st.cache(allow_output_mutation=True)
 def uiBackend():
     backend = Backend()
@@ -22,6 +23,7 @@ def uiBackend():
     # st.write("Cache miss: ui backend")
     return backend
 
+# function to plot the different type of graph for the training set
 def getGraphs(dataset,plot_type):
     # plot cci
     fig, ax = plt.subplots()
@@ -47,6 +49,7 @@ def getGraphs(dataset,plot_type):
         ax.set_ylabel("MACD histogram")
     return fig
 
+# function to generate the heatmap given the data from the testset
 def heatmap(data,sdate):
     cols = list(data.keys())
     info = list(data.values())
@@ -77,6 +80,8 @@ def heatmap(data,sdate):
 def main():
     becopy = uiBackend()
     st.title("50.039 Big Project Group 16")
+
+    # sidebar for navigation of the interface
     st.sidebar.title("Navigation")
     train1, train_data, test_data = getTrainData()
     choice = st.sidebar.radio("",['Data Visualisation',"Test Set"])
@@ -90,7 +95,6 @@ def main():
         col2.write(getGraphs(train1,"macd"))
         col1.write(getGraphs(train1,"signal"))
         col2.write(getGraphs(train1,"hist"))
-
     else:
         st.subheader("Which date would you like to choose?")
         # slider for display of each data
@@ -99,16 +103,18 @@ def main():
         st.subheader("Selected date:" + sDate)
         newdf = test_data[test_data.Date==sDate]
         newdf
+        # to get prediction from user choice
         if st.checkbox("Try with this data"):
             st.write("Results from",sDate)
             a = becopy.get_individual_data_sample(sDate)
+            # display raw data that user haven choosen
             data={'High':a[0][0], 'Low':a[0][1], 'Close':a[0][2],\
                 'CCI-5':a[0][3], 'CCI-10':a[0][4], 'CCI-20':a[0][5], \
                 'MACD':a[0][6], 'MACD-Signal':a[0][7], 'MACD-Histogram':a[0][8]}
             df = pd.DataFrame(data)
             st.subheader("Data Features")
             df.T
-            # model prediction (int)
+            # model prediction results
             st.header("Ground Truth Label: "+str(a[2]))
             st.header("Predicted Value: "+str(a[1]))
             if a[1] == 1:
